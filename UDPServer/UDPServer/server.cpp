@@ -58,7 +58,7 @@ int main()
 			exit(EXIT_FAILURE);
 		}
 
-		std::cout << "Received packet from " << inet_ntoa(senderAddr.sin_addr) << ":" << ntohs(senderAddr.sin_port) << std::endl << "Data: " << buffer << std::endl;
+		//std::cout << "Received packet from " << inet_ntoa(senderAddr.sin_addr) << ":" << ntohs(senderAddr.sin_port) << std::endl << "Data: " << buffer << std::endl;
 
 		if (buffer[0] == '0')
 		{
