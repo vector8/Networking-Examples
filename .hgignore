@@ -3,3 +3,6 @@ syntax: glob
 *.suo
 */Debug/*
 */Release/*
+Assignment 1/Boids/Boids.CSharp.csproj
+Assignment 1/Boids/Boids.sln
+Assignment 1/Boids/Library/*
