@@ -7,10 +7,13 @@ extern "C"
 {
 #endif
 
-	LIB_API void runCommand(int commandType, char* arg);
-	LIB_API bool hasChanged();
-	LIB_API bool getErrorStatus();
-	LIB_API char* getErrorMessage();
+	LIB_API void initialize(int port, char* serverAddress);
+	LIB_API void sendMsg(char* msg, int msgLength);
+	LIB_API bool hasReceived();
+	LIB_API char* getLastReceived();
+	LIB_API bool hasError();
+	LIB_API const char* getError();
+	LIB_API void cleanUp();
 
 #ifdef __cplusplus
 }

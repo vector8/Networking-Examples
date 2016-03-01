@@ -1,4 +1,5 @@
 #include "NetworkManager.h"
+#include <string>
 
 NetworkManager::NetworkManager()
 {
@@ -59,7 +60,7 @@ void NetworkManager::initialize(int port, std::string serverAddress)
 	}
 	else
 	{
-		char buffer[1024];
+		char buffer[BUFFLEN];
 
 		// send connect msg
 		std::string connectMsg = "0";
@@ -67,8 +68,8 @@ void NetworkManager::initialize(int port, std::string serverAddress)
 		int error = WSAGetLastError();
 		if (error != WSAEWOULDBLOCK && error != 0)
 		{
-			std::string error = "Error code : " + error + "\n";
-			throwError(error);
+			std::string errorMsg = "Error code: " + std::to_string(error);
+			throwError(errorMsg);
 		}
 	}
 
@@ -76,9 +77,10 @@ void NetworkManager::initialize(int port, std::string serverAddress)
 	recThread = std::thread(&NetworkManager::receiveThread, this);
 }
 
-void NetworkManager::throwError(std::string errorMsg)
+void NetworkManager::throwError(std::string msg)
 {
-	// TODO: pass the error up to unity
+	hasError = true;
+	errorMsg = msg;
 }
 
 void NetworkManager::receiveThread()
@@ -88,25 +90,26 @@ void NetworkManager::receiveThread()
 	while (running)
 	{
 		memset(buffer, 0, 1024);
-		recvfrom(sock, buffer, 1024, 0, (struct sockaddr *) &sockAddr, &slen);
+		int recLenTemp = recvfrom(sock, buffer, 1024, 0, (struct sockaddr *) &sockAddr, &slen);
 
 		int error = WSAGetLastError();
 		if (error != WSAEWOULDBLOCK && error != 0)
 		{
-			std::string error = "Error code : " + error + "\n";
-			throwError(error);
+			std::string errorMsg = "Error code: " + std::to_string(error);
+			throwError(errorMsg);
 		}
 		else if (error == 0)
 		{
+			memset(received, '\0', BUFFLEN);
 			if (isServer && !connected)
 			{
 				connected = true;
 				continue;
 			}
 
-			// TODO: do something with the memory in buffer
-
-			//memcpy(otherTrans, buffer, sizeof(float) * 2);
+			memcpy(received, buffer, recLenTemp);
+			recLen = recLenTemp;
+			newReceived = true;
 		}
 	}
 }
@@ -117,6 +120,7 @@ void NetworkManager::cleanUp()
 	recThread.join();
 	shutdown(sock, SD_BOTH);
 	closesocket(sock);
+	WSACleanup();
 }
 
 void NetworkManager::send(char* message, int length)

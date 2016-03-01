@@ -25,6 +25,13 @@ private:
 	void receiveThread();
 
 public:
+	char received[BUFFLEN];
+	bool newReceived;
+	int recLen;
+
+	bool hasError;
+	std::string errorMsg;
+
 	NetworkManager();
 	~NetworkManager();
 
