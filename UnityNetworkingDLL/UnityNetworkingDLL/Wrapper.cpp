@@ -1,19 +1,45 @@
 #include "Wrapper.h"
+#include "NetworkManager.h"
 
-//HgCommandManager instance;
+NetworkManager instance;
 
-void runCommand(int commandType, char* arg)
+void initialize(int port, char* serverAddress)
 {
+	std::string server(serverAddress);
+
+	instance.initialize(port, server);
 }
 
-bool hasChanged()
+void sendMsg(char* msg, int msgLength)
 {
+	instance.send(msg, msgLength);
 }
 
-bool getErrorStatus()
+bool hasReceived()
 {
+	bool result = instance.newReceived;
+	instance.newReceived = false;
+	return result;
 }
 
-char* getErrorMessage()
+char* getLastReceived()
 {
+	return instance.received;
+}
+
+bool hasError()
+{
+	bool result = instance.hasError;
+	instance.hasError = false;
+	return result;
+}
+
+const char* getError()
+{
+	return instance.errorMsg.c_str();
+}
+
+void cleanUp()
+{
+	instance.cleanUp();
 }

@@ -6,6 +6,8 @@ public class BoidFlock : MonoBehaviour
     public int numberOfBoids;
     public GameObject boidPrefab;
 
+    public Transform parentNode;
+
     public float pullFactor, proximityFactor, inertiaFactor;
     public float neighbourDistance;
 
@@ -13,6 +15,8 @@ public class BoidFlock : MonoBehaviour
     public Vector3 limits;
 
     public List<Boid> flock;
+
+    public NetworkManager networkMgr;
 
     const float CORRECTION_ACCELERATION = 2f;
 
@@ -24,16 +28,27 @@ public class BoidFlock : MonoBehaviour
         {
             GameObject go = GameObject.Instantiate<GameObject>(boidPrefab);
             go.transform.position = new Vector3(Random.Range(-1f, 1f), Random.Range(-1f, 1f), Random.Range(-1f, 1f));
-            go.transform.SetParent(transform);
+            go.transform.SetParent(parentNode);
             Boid b = go.GetComponent<Boid>();
             b.id = i;
             flock.Add(b);
         }
+
+        parentNode.gameObject.SetActive(false);
     }
 
     // Update is called once per frame
     void Update()
     {
+        if(networkMgr.initialized)
+        {
+            parentNode.gameObject.SetActive(true);
+        }
+        else
+        {
+            return;
+        }
+
         Vector3 centre = new Vector3(), inertia = new Vector3();
         Vector3 alignment = new Vector3();
         foreach(Boid b in flock)
