@@ -86,11 +86,19 @@ void NetworkManager::throwError(std::string msg)
 void NetworkManager::receiveThread()
 {
 	bool connected = false;
-	char buffer[1024];
+	char buffer[BUFFLEN];
 	while (running)
 	{
-		memset(buffer, 0, 1024);
-		int recLenTemp = recvfrom(sock, buffer, 1024, 0, (struct sockaddr *) &sockAddr, &slen);
+		memset(buffer, '\0', BUFFLEN);
+		int recLenTemp;
+		if (isServer)
+		{
+			recLenTemp = recvfrom(sock, buffer, BUFFLEN, 0, (struct sockaddr *) &senderAddr, &slen);
+		}
+		else
+		{
+			recLenTemp = recvfrom(sock, buffer, BUFFLEN, 0, (struct sockaddr *) &sockAddr, &slen);
+		}
 
 		int error = WSAGetLastError();
 		if (error != WSAEWOULDBLOCK && error != 0)
@@ -100,16 +108,20 @@ void NetworkManager::receiveThread()
 		}
 		else if (error == 0)
 		{
-			memset(received, '\0', BUFFLEN);
+			//while (memoryLock);
+			//memoryLock = true;
+			//memset(received, '\0', BUFFLEN);
 			if (isServer && !connected)
 			{
 				connected = true;
 				continue;
 			}
 
-			memcpy(received, buffer, recLenTemp);
-			recLen = recLenTemp;
+			//memcpy(received, buffer, recLenTemp);
+			//recLen = recLenTemp;
+			received = std::string(buffer);
 			newReceived = true;
+			//memoryLock = false;
 		}
 	}
 }
@@ -123,14 +135,24 @@ void NetworkManager::cleanUp()
 	WSACleanup();
 }
 
-void NetworkManager::send(char* message, int length)
+void NetworkManager::send(std::string message)
 {
-	memcpy(msg, message, length);
+	//memcpy(msg, message, length);
 
-	if (sendto(sock, msg, length, 0, (struct sockaddr*) &sockAddr, slen) == SOCKET_ERROR)
+	if (isServer)
 	{
-		throwError("sendto() failed with error code: " + WSAGetLastError());
+		if (sendto(sock, message.c_str(), message.length(), 0, (struct sockaddr*) &senderAddr, slen) == SOCKET_ERROR)
+		{
+			throwError("sendto() failed with error code: " + WSAGetLastError());
+		}
+	}
+	else
+	{
+		if (sendto(sock, message.c_str(), message.length(), 0, (struct sockaddr*) &sockAddr, slen) == SOCKET_ERROR)
+		{
+			throwError("sendto() failed with error code: " + WSAGetLastError());
+		}
 	}
 
-	memset(msg, '\0', BUFFLEN);
+	//memset(msg, '\0', BUFFLEN);
 }

@@ -1,7 +1,12 @@
 #include "Wrapper.h"
 #include "NetworkManager.h"
+#include <fstream>
+#include <sstream>
 
 NetworkManager instance;
+//unsigned char* recBuf = new unsigned char[BUFFLEN];
+//unsigned char* sendBuf = new unsigned char[BUFFLEN];
+//bool writeOnce = false;
 
 void initialize(int port, char* serverAddress)
 {
@@ -10,9 +15,10 @@ void initialize(int port, char* serverAddress)
 	instance.initialize(port, server);
 }
 
-void sendMsg(char* msg, int msgLength)
+void sendMsg(char* msg)
 {
-	instance.send(msg, msgLength);
+	std::string smsg(msg);
+	instance.send(smsg);
 }
 
 bool hasReceived()
@@ -24,7 +30,11 @@ bool hasReceived()
 
 char* getLastReceived()
 {
-	return instance.received;
+	//memcpy(recBuf, instance.received, instance.recLen);
+	//length = instance.recLen;
+	//instance.memoryLock = false;
+
+	return (char*)instance.received.c_str();
 }
 
 bool hasError()
@@ -34,9 +44,9 @@ bool hasError()
 	return result;
 }
 
-const char* getError()
+char* getError()
 {
-	return instance.errorMsg.c_str();
+	return (char*)instance.errorMsg.c_str();
 }
 
 void cleanUp()

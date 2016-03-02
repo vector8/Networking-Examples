@@ -1,16 +1,20 @@
-﻿using UnityEngine;
-using System.Collections;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 
-public class NetworkingWrapper : MonoBehaviour
+public static class NetworkingWrapper
 {
+    public struct Message
+    {
+        public int size;
+        public byte[] bytes;
+    }
+
     private const string DLL_NAME = "UnityNetworkingDLL";
 
     [DllImport(DLL_NAME)]
     public static extern void initialize(int port, string serverAddress);
 
     [DllImport(DLL_NAME)]
-    public static extern void sendMsg(string msg, int length);
+    public static extern void sendMsg(string msg);
 
     [DllImport(DLL_NAME)]
     public static extern bool hasReceived();

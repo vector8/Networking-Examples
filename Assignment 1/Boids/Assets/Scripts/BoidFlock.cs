@@ -4,49 +4,56 @@ using System.Collections.Generic;
 public class BoidFlock : MonoBehaviour
 {
     public int numberOfBoids;
-    public GameObject boidPrefab;
+    public GameObject boidPrefab, remotePrefab;
 
-    public Transform parentNode;
+    public Transform localParent, remoteParent;
 
-    public float pullFactor, proximityFactor, inertiaFactor;
+    public float pullFactor, proximityFactor, inertiaFactor, goalFactor;
     public float neighbourDistance;
 
     public float maxVelocity;
     public Vector3 limits;
 
-    public List<Boid> flock;
+    public List<Boid> flock, remoteFlock;
 
-    public NetworkManager networkMgr;
+    public BoidNetworkManager networkMgr;
 
     const float CORRECTION_ACCELERATION = 2f;
+
+    private float networkUpdateTimer = 0f;
+    const float NETWORK_DELAY = 0.01f;
 
     // Use this for initialization
     void Start()
     {
         flock = new List<Boid>();
-        for(int i = 0; i < numberOfBoids; i++)
+        for (int i = 0; i < numberOfBoids; i++)
         {
             GameObject go = GameObject.Instantiate<GameObject>(boidPrefab);
             go.transform.position = new Vector3(Random.Range(-1f, 1f), Random.Range(-1f, 1f), Random.Range(-1f, 1f));
-            go.transform.SetParent(parentNode);
+            go.transform.SetParent(localParent);
             Boid b = go.GetComponent<Boid>();
             b.id = i;
             flock.Add(b);
         }
-
-        parentNode.gameObject.SetActive(false);
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(networkMgr.initialized)
+        Vector3 goal = new Vector3();
+        bool followGoal = false;
+        followGoal = Input.GetMouseButton(0);
+        if (followGoal)
         {
-            parentNode.gameObject.SetActive(true);
-        }
-        else
-        {
-            return;
+            RaycastHit hit;
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            if(Physics.Raycast(ray, out hit))
+            {
+                goal = hit.point;
+            }
+            print("Mouse position: " + Input.mousePosition.ToString());
+            print("Goal position: " + goal.ToString());
         }
 
         Vector3 centre = new Vector3(), inertia = new Vector3();
@@ -57,17 +64,24 @@ public class BoidFlock : MonoBehaviour
             inertia += b.velocity;
         }
 
-        centre /= numberOfBoids;
-        inertia /= numberOfBoids;
+        foreach(Boid b in remoteFlock)
+        {
+            centre += b.transform.position;
+            inertia += b.velocity;
+        }
+
+        centre /= (numberOfBoids + remoteFlock.Count);
+        inertia /= (numberOfBoids + remoteFlock.Count);
         alignment = inertia * inertiaFactor;
 
         foreach(Boid b in flock)
         {
-            Vector3 pull = new Vector3(), separation = new Vector3();
+            Vector3 pull = new Vector3(), separation = new Vector3(), goalForce = new Vector3();
 
             Vector3 localCentre = new Vector3();
             localCentre += b.transform.position;
             int numNeighbours = 1;
+
             foreach (Boid b2 in flock)
             {
                 if(b2.id != b.id && (Vector3.SqrMagnitude(b2.transform.position - b.transform.position) < neighbourDistance))
@@ -76,11 +90,25 @@ public class BoidFlock : MonoBehaviour
                     numNeighbours++;
                 }
             }
+
+            foreach (Boid b2 in remoteFlock)
+            {
+                if (b2.id != b.id && (Vector3.SqrMagnitude(b2.transform.position - b.transform.position) < neighbourDistance))
+                {
+                    localCentre += b2.transform.position;
+                    numNeighbours++;
+                }
+            }
+
             localCentre /= numNeighbours;
 
+            if(followGoal)
+            {
+                goalForce = (goal - b.transform.position) * goalFactor;
+            }
             pull = (centre - b.transform.position) * pullFactor;
             separation = (b.transform.position - localCentre) * proximityFactor;
-            Vector3 acceleration = alignment + pull + separation;
+            Vector3 acceleration = alignment + pull + separation + goalForce;
 
             // Screen limits
             if(b.transform.position.x < -limits.x)
@@ -118,5 +146,11 @@ public class BoidFlock : MonoBehaviour
             b.transform.LookAt(b.transform.position + Vector3.Normalize(b.velocity));
         }
 
+        networkUpdateTimer += Time.deltaTime;
+        if(networkUpdateTimer > NETWORK_DELAY)
+        {
+            networkMgr.sendFlockToRemote(flock);
+            networkUpdateTimer = 0f;
+        }
     }
 }

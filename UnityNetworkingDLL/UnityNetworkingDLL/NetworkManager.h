@@ -8,7 +8,7 @@
 
 #pragma comment(lib, "ws2_32.lib")
 
-#define BUFFLEN 1024
+#define BUFFLEN 4096
 
 class NetworkManager
 {
@@ -16,18 +16,16 @@ private:
 	int port;
 	std::string serverAddress;
 	SOCKET sock;
-	struct sockaddr_in sockAddr;
+	struct sockaddr_in sockAddr, senderAddr;
 	int slen;
-	char msg[BUFFLEN];
 	bool running, isServer;
 	std::thread recThread;
 
 	void receiveThread();
 
 public:
-	char received[BUFFLEN];
+	std::string received;
 	bool newReceived;
-	int recLen;
 
 	bool hasError;
 	std::string errorMsg;
@@ -41,5 +39,5 @@ public:
 
 	void cleanUp();
 
-	void send(char* message, int length);
+	void send(std::string message);
 };

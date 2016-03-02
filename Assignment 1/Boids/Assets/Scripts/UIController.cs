@@ -4,7 +4,7 @@ using System.Collections;
 
 public class UIController : MonoBehaviour
 {
-    public NetworkManager networkMgr;
+    public BoidNetworkManager networkMgr;
     public InputField serverAddressField;
     public Button startBtn;
     public Toggle asServer;
@@ -19,7 +19,7 @@ public class UIController : MonoBehaviour
     public void startButtonPressed()
     {
         string address = (asServer.isOn ? "" : serverAddressField.text);
-        networkMgr.initialize(8888, address);
+        networkMgr.initialize(8888, address, true);
         gameObject.SetActive(false);
     }
 
