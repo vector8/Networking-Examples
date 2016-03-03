@@ -19,12 +19,11 @@ void NetworkManager::initialize(int port, std::string serverAddress)
 
 	WSADATA wsa;
 
-	//printf("\nInitialising Winsock...");
+	//initialise Winsock
 	if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
 	{
 		throwError("Failed. Error Code: " + WSAGetLastError());
 	}
-	//printf("Initialised.\n");
 
 	//create socket
 	sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
@@ -60,8 +59,6 @@ void NetworkManager::initialize(int port, std::string serverAddress)
 	}
 	else
 	{
-		char buffer[BUFFLEN];
-
 		// send connect msg
 		std::string connectMsg = "0";
 		sendto(sock, connectMsg.c_str(), connectMsg.length(), 0, (struct sockaddr *) &sockAddr, slen);
@@ -108,20 +105,14 @@ void NetworkManager::receiveThread()
 		}
 		else if (error == 0)
 		{
-			//while (memoryLock);
-			//memoryLock = true;
-			//memset(received, '\0', BUFFLEN);
 			if (isServer && !connected)
 			{
 				connected = true;
 				continue;
 			}
 
-			//memcpy(received, buffer, recLenTemp);
-			//recLen = recLenTemp;
 			received = std::string(buffer);
 			newReceived = true;
-			//memoryLock = false;
 		}
 	}
 }
@@ -137,8 +128,6 @@ void NetworkManager::cleanUp()
 
 void NetworkManager::send(std::string message)
 {
-	//memcpy(msg, message, length);
-
 	if (isServer)
 	{
 		if (sendto(sock, message.c_str(), message.length(), 0, (struct sockaddr*) &senderAddr, slen) == SOCKET_ERROR)
@@ -153,6 +142,4 @@ void NetworkManager::send(std::string message)
 			throwError("sendto() failed with error code: " + WSAGetLastError());
 		}
 	}
-
-	//memset(msg, '\0', BUFFLEN);
 }
