@@ -193,7 +193,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 229440814}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 4.82}
+  m_LocalPosition: {x: 0, y: 0, z: 7}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -299,14 +299,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   numberOfBoids: 50
-  boidPrefab: {fileID: 121290, guid: 3eade27309932a149a24bb23b64d16ae, type: 2}
-  remotePrefab: {fileID: 121290, guid: 27967884c10e9554a937d62117bda134, type: 2}
+  boidPrefab: {fileID: 105996, guid: fb04b89ae4d04064c952f8d9a2607bd1, type: 2}
+  remotePrefab: {fileID: 171616, guid: 00c0ed22453f1eb4591cb3514449c422, type: 2}
   localParent: {fileID: 813517240}
   remoteParent: {fileID: 740223871}
   pullFactor: 0.84
   proximityFactor: 73
   inertiaFactor: 1.72
-  goalFactor: 1
+  goalFactor: 15
   neighbourDistance: 1
   maxVelocity: 5
   limits: {x: 5, y: 3, z: 4}

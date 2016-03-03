@@ -99,6 +99,8 @@ public class BoidNetworkManager : MonoBehaviour
                 flock.remoteFlock[i].transform.position = new Vector3(float.Parse(tokens[i * 6]), float.Parse(tokens[i * 6 + 1]), float.Parse(tokens[i * 6 + 2]));
                 flock.remoteFlock[i].velocity = new Vector3(float.Parse(tokens[i * 6 + 3]), float.Parse(tokens[i * 6 + 4]), float.Parse(tokens[i * 6 + 5]));
                 flock.remoteFlock[i].id = i;
+                // turn the boid toward their velocity
+                flock.remoteFlock[i].transform.LookAt(flock.remoteFlock[i].transform.position + Vector3.Normalize(flock.remoteFlock[i].velocity));
             }
         }
         else
@@ -118,6 +120,8 @@ public class BoidNetworkManager : MonoBehaviour
                 Boid b = go.GetComponent<Boid>();
                 b.velocity = new Vector3(float.Parse(tokens[i * 6 + 3]), float.Parse(tokens[i * 6 + 4]), float.Parse(tokens[i * 6 + 5]));
                 b.id = i;
+                // turn the boid toward their velocity
+                b.transform.LookAt(b.transform.position + Vector3.Normalize(b.velocity));
                 flock.remoteFlock.Add(b);
             }
         }
