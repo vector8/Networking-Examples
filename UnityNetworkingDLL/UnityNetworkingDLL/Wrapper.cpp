@@ -4,9 +4,6 @@
 #include <sstream>
 
 NetworkManager instance;
-//unsigned char* recBuf = new unsigned char[BUFFLEN];
-//unsigned char* sendBuf = new unsigned char[BUFFLEN];
-//bool writeOnce = false;
 
 void initialize(int port, char* serverAddress)
 {
@@ -30,10 +27,6 @@ bool hasReceived()
 
 char* getLastReceived()
 {
-	//memcpy(recBuf, instance.received, instance.recLen);
-	//length = instance.recLen;
-	//instance.memoryLock = false;
-
 	return (char*)instance.received.c_str();
 }
 
