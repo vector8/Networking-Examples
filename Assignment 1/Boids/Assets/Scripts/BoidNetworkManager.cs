@@ -39,9 +39,9 @@ public class BoidNetworkManager : MonoBehaviour
 
     private void checkErrors()
     {
-        if (NetworkingWrapper.hasError())
+        if (CitaNetWrapper.hasError())
         {
-            Debug.Log(NetworkingWrapper.getErrorMessage());
+            Debug.Log(CitaNetWrapper.getErrorMessage());
         }
     }
 
@@ -51,16 +51,16 @@ public class BoidNetworkManager : MonoBehaviour
         if (initialized)
         {
             // clean up in case we had already initialized
-            NetworkingWrapper.cleanUp();
+            CitaNetWrapper.cleanUp();
         }
 
         this.port = port;
         this.serverAddress = serverAddress;
-        NetworkingWrapper.initialize(port, serverAddress);
-        if (NetworkingWrapper.hasError())
+        CitaNetWrapper.initialize(port, serverAddress);
+        if (CitaNetWrapper.hasError())
         {
-            Debug.Log(NetworkingWrapper.getErrorMessage());
-            NetworkingWrapper.cleanUp();
+            Debug.Log(CitaNetWrapper.getErrorMessage());
+            CitaNetWrapper.cleanUp();
         }
         else
         {
@@ -71,14 +71,14 @@ public class BoidNetworkManager : MonoBehaviour
 
     public bool hasNewMessage()
     {
-        bool result = NetworkingWrapper.hasReceived();
+        bool result = CitaNetWrapper.hasReceived();
         checkErrors();
         return result;
     }
 
     public void parseReceivedMessage()
     {
-        string receivedMsg = NetworkingWrapper.getLastReceivedMessage();
+        string receivedMsg = CitaNetWrapper.getLastReceivedMessage();
         checkErrors();
 
         //print("Received: " + receivedMsg);
@@ -139,7 +139,7 @@ public class BoidNetworkManager : MonoBehaviour
 
         msgToSend.Substring(0, msgToSend.Length - 1);
 
-        NetworkingWrapper.sendMsg(msgToSend);
+        CitaNetWrapper.sendMsg(msgToSend);
         checkErrors();
     }
 
@@ -147,7 +147,7 @@ public class BoidNetworkManager : MonoBehaviour
     {
         if (initialized)
         {
-            NetworkingWrapper.cleanUp();
+            CitaNetWrapper.cleanUp();
         }
     }
 }
