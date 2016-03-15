@@ -1,14 +1,8 @@
 ﻿using System.Runtime.InteropServices;
 
-public static class NetworkingWrapper
+public static class CitaNetWrapper
 {
-    public struct Message
-    {
-        public int size;
-        public byte[] bytes;
-    }
-
-    private const string DLL_NAME = "UnityNetworkingDLL";
+    private const string DLL_NAME = "CitaNet";
 
     [DllImport(DLL_NAME)]
     public static extern void initialize(int port, string serverAddress);
