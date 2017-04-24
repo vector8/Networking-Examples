@@ -35,7 +35,6 @@ namespace CitaNet
             {
                 return watch.ElapsedMilliseconds;
             }
-            private set;
         }
 
         public static long deltaTime
@@ -46,7 +45,6 @@ namespace CitaNet
                 lastTime = watch.ElapsedMilliseconds;
                 return result;
             }
-            private set;
         }
     }
 }

@@ -36,6 +36,7 @@ namespace CitaNet
         public void run()
         {
             server.BeginReceive(new AsyncCallback(receiveCallback), state);
+            Console.WriteLine("CitaNet server started up, waiting for client connections...");
 
             while (running)
             {
