@@ -18,6 +18,18 @@ namespace CitaNet
         public UdpClient client;
     }
 
+    class CitaClient
+    {
+        public CitaClient(IPEndPoint e)
+        {
+            endpoint = e;
+            currentMessageID = 0;
+        }
+
+        public IPEndPoint endpoint;
+        public int currentMessageID;
+    }
+
     static class Time
     {
         private static Stopwatch watch;

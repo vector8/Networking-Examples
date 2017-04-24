@@ -11,7 +11,7 @@ namespace CitaNet
 {
     class CitaNetServer
     {
-        private Dictionary<string, IPEndPoint> clients = new Dictionary<string, IPEndPoint>();
+        private Dictionary<string, CitaClient> clients = new Dictionary<string, CitaClient>();
         private Dictionary<int, Message> messagesAwaitingAck = new Dictionary<int, Message>();
         private IPEndPoint endpoint;
         private UdpClient server;
@@ -100,7 +100,8 @@ namespace CitaNet
 
                             broadcastMessage(m);
 
-                            clients.Add(endpoint.Address.ToString(), endpoint);
+                            CitaClient c = new CitaClient(endpoint);
+                            clients.Add(endpoint.Address.ToString(), c);
 
                             Console.WriteLine("Client " + endpoint.Address.ToString() + " connected.");
 
@@ -156,9 +157,9 @@ namespace CitaNet
         // send message to all clients
         private void broadcastMessage(Message m)
         {
-            foreach(IPEndPoint e in clients.Values)
+            foreach(CitaClient c in clients.Values)
             {
-                server.SendAsync(m.contents, m.contents.Length, m.endpoint);
+                server.SendAsync(m.contents, m.contents.Length, c.endpoint);
 
                 int messageID = BitConverter.ToInt32(m.contents, 1);
                 messagesAwaitingAck.Add(messageID, m);
